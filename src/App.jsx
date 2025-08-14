@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Phone } from "lucide-react";
 
@@ -12,19 +12,36 @@ const sections = [
   "Terms & Conditions",
 ];
 
-const services = [
-  { title: "Web Development", desc: "Modern, responsive websites." },
-  { title: "UI/UX Design", desc: "Apple-like smooth design." },
-  { title: "Consulting", desc: "Professional strategy & planning." },
-];
-
-const projects = [
-  { title: "Ticketing System", desc: "Description of project one." },
-  { title: "Appointment Setter Calendar", desc: "Description of project two." },
-  { title: "Professional Website", desc: "Description of project three." },
-];
-
 export default function App() {
+  // Services & Projects state (editable)
+  const [services, setServices] = useState([
+    { title: "Web Development", desc: "Modern, responsive websites." },
+    { title: "UI/UX Design", desc: "Apple-like smooth design." },
+    { title: "Consulting", desc: "Professional strategy & planning." },
+  ]);
+
+  const [projects, setProjects] = useState([
+    { title: "Ticketing System", desc: "Description of project one." },
+    { title: "Appointment Setter Calendar", desc: "Description of project two." },
+    { title: "Professional Website", desc: "Description of project three." },
+  ]);
+
+  // Chat Panel state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+
+  const sendMessage = () => {
+    if (inputMessage.trim() === "") return;
+    setMessages([...messages, { text: inputMessage, time: new Date() }]);
+    setInputMessage("");
+  };
+
+  // Admin panel (add service/project)
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [newService, setNewService] = useState({ title: "", desc: "" });
+  const [newProject, setNewProject] = useState({ title: "", desc: "" });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 text-gray-900">
       {/* Navbar */}
@@ -44,15 +61,35 @@ export default function App() {
       </nav>
 
       {/* Hero / Home */}
-      <section id="home" className="h-screen flex flex-col justify-center items-center text-center p-4">
-        <motion.h1 initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} className="text-5xl font-bold mb-4">
+      <section
+        id="home"
+        className="h-screen flex flex-col justify-center items-center text-center p-4"
+      >
+        <motion.h1
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="text-5xl font-bold mb-4"
+        >
           YOUR NAME
         </motion.h1>
-        <motion.p initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.3 }} className="text-xl mb-6">
+        <motion.p
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-xl mb-6"
+        >
           Professional Title / Role
         </motion.p>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.6, delay: 0.6 }}>
-          <a href="#contact" className="px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <a
+            href="#contact"
+            className="px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition"
+          >
             Contact Me
           </a>
         </motion.div>
@@ -62,16 +99,61 @@ export default function App() {
       <section id="about" className="py-24 text-center">
         <h2 className="text-3xl font-bold mb-6">About Me</h2>
         <p className="max-w-2xl mx-auto">
-          Add a short professional biography. Describe your expertise, achievements, and what makes you unique.
+          Add a short professional biography. Describe your expertise, achievements, and what
+          makes you unique.
         </p>
       </section>
 
       {/* Services */}
       <section id="services" className="py-24 bg-white/50 backdrop-blur-md">
-        <h2 className="text-3xl font-bold text-center mb-12">Services</h2>
+        <div className="flex justify-between items-center max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12">Services</h2>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+            onClick={() => setAdminOpen(!adminOpen)}
+          >
+            {adminOpen ? "Close Admin" : "Admin Panel"}
+          </button>
+        </div>
+
+        {adminOpen && (
+          <div className="max-w-3xl mx-auto mb-12 p-4 bg-white/70 backdrop-blur-md rounded-xl shadow-md">
+            <h3 className="font-semibold mb-2">Add Service</h3>
+            <input
+              type="text"
+              placeholder="Title"
+              className="border p-2 mr-2 rounded"
+              value={newService.title}
+              onChange={(e) => setNewService({ ...newService, title: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              className="border p-2 mr-2 rounded"
+              value={newService.desc}
+              onChange={(e) => setNewService({ ...newService, desc: e.target.value })}
+            />
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+              onClick={() => {
+                if (newService.title && newService.desc) {
+                  setServices([...services, newService]);
+                  setNewService({ title: "", desc: "" });
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-wrap justify-center gap-8">
-          {services.map((s) => (
-            <motion.div key={s.title} className="glass p-6 rounded-xl w-64 text-center shadow-lg hover:scale-105 transition" whileHover={{ scale: 1.05 }}>
+          {services.map((s, i) => (
+            <motion.div
+              key={i}
+              className="glass p-6 rounded-xl w-64 text-center shadow-lg hover:scale-105 transition"
+              whileHover={{ scale: 1.05 }}
+            >
               <h3 className="text-xl font-semibold mb-2">{s.title}</h3>
               <p>{s.desc}</p>
             </motion.div>
@@ -82,9 +164,45 @@ export default function App() {
       {/* Projects */}
       <section id="projects" className="py-24 text-center">
         <h2 className="text-3xl font-bold mb-12">Projects</h2>
+
+        {adminOpen && (
+          <div className="max-w-3xl mx-auto mb-12 p-4 bg-white/70 backdrop-blur-md rounded-xl shadow-md">
+            <h3 className="font-semibold mb-2">Add Project</h3>
+            <input
+              type="text"
+              placeholder="Title"
+              className="border p-2 mr-2 rounded"
+              value={newProject.title}
+              onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              className="border p-2 mr-2 rounded"
+              value={newProject.desc}
+              onChange={(e) => setNewProject({ ...newProject, desc: e.target.value })}
+            />
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+              onClick={() => {
+                if (newProject.title && newProject.desc) {
+                  setProjects([...projects, newProject]);
+                  setNewProject({ title: "", desc: "" });
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-wrap justify-center gap-8">
-          {projects.map((p) => (
-            <motion.div key={p.title} className="glass p-6 rounded-xl w-72 shadow-lg hover:scale-105 transition" whileHover={{ scale: 1.05 }}>
+          {projects.map((p, i) => (
+            <motion.div
+              key={i}
+              className="glass p-6 rounded-xl w-72 shadow-lg hover:scale-105 transition"
+              whileHover={{ scale: 1.05 }}
+            >
               <h3 className="text-xl font-semibold mb-2">{p.title}</h3>
               <p>{p.desc}</p>
             </motion.div>
@@ -126,14 +244,39 @@ export default function App() {
         </p>
       </section>
 
-      {/* Floating Chat Buttons */}
+      {/* Floating Chat */}
       <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-50">
-        <a href="https://m.me/YOUR_MESSENGER_USERNAME" target="_blank" rel="noreferrer" className="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition flex items-center justify-center">
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          className="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition flex items-center justify-center"
+        >
           <MessageCircle size={24} />
-        </a>
-        <a href="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noreferrer" className="bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition flex items-center justify-center">
-          <Phone size={24} />
-        </a>
+        </button>
+        {chatOpen && (
+          <div className="w-80 h-96 bg-white/90 shadow-lg rounded-xl p-4 flex flex-col">
+            <div className="flex-1 overflow-y-auto mb-2">
+              {messages.map((m, i) => (
+                <p key={i} className="text-gray-800 p-1 border-b">{m.text}</p>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                placeholder="Type message..."
+                className="flex-1 border p-2 rounded"
+              />
+              <button
+                onClick={sendMessage}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
