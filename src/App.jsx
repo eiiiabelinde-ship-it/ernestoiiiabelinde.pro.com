@@ -19,9 +19,9 @@ const services = [
 ];
 
 const projects = [
-  { title: "Project One", desc: "Description of project one." },
-  { title: "Project Two", desc: "Description of project two." },
-  { title: "Project Three", desc: "Description of project three." },
+  { title: "Ticketing System", desc: "Description of project one." },
+  { title: "Appointment Setter Calendar", desc: "Description of project two." },
+  { title: "Professional Website", desc: "Description of project three." },
 ];
 
 export default function App() {
